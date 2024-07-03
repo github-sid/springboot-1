@@ -47,17 +47,18 @@ public class RunController {
     void create(@Valid @RequestBody Run run){
         runrepo.create(run);
     }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/{id}")
-    void update(@Valid @RequestBody Run run,@PathVariable Integer id){
-        runrepo.update(run,id);
-    }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    void delete(@PathVariable Integer id)
-    {
-        runrepo.delete(id);
-    }
+//
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @PutMapping("/{id}")
+//    void update(@Valid @RequestBody Run run,@PathVariable Integer id){
+//        runrepo.update(run,id);
+//    }
+//
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @DeleteMapping("/{id}")
+//    void delete(@PathVariable Integer id)
+//    {
+//        runrepo.delete(id);
+//    }
 }
+

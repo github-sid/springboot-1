@@ -1,7 +1,12 @@
 package com.sid.runners.run;
 
+import com.sid.runners.Application;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -13,108 +18,56 @@ import java.util.Optional;
 @Repository
 public class RunRepo {
 
+    private static final Logger log = LoggerFactory.getLogger(RunRepo.class);
 
-    private List<Run> runs = new ArrayList<>();
+    private final JdbcClient jdbcClient;
 
-
-    List<Run> findAll(){
-        return runs;
+    //DI -> JDBC Client Instance
+    public RunRepo(JdbcClient jdbcClient){
+        this.jdbcClient = jdbcClient;
     }
 
-    //Optional -> container object which may or may not contain null
-    //if the value is present => isPresent() return true
-    //Way to deal with objects
-    Optional<Run> findById(Integer id){
-        return runs.stream()
-                .filter(run -> run.id() == id)
-                .findFirst();
-    }
-
-    void create(Run run){
-        runs.add(run);
+    public List<Run> findAll(){
+        return jdbcClient.sql("select * from run")
+                .query(Run.class)
+                .list();
     }
 
 
-    void update(Run run, Integer id) {
-        Optional<Run> existingRun = findById(id);
-        if (existingRun.isPresent()) {
-            runs.set(runs.indexOf(existingRun.get()), run);
-        }
+    public Optional<Run> findById(Integer id){
+        return jdbcClient.sql("select id," +
+                        " title," +
+                        "started_on," +
+                        "completed_on," +
+                        "miles," +
+                        "location " +
+                        "from Run WHERE id = :id")
+                .param("id", id)
+                .query(Run.class)
+                .optional();
     }
 
-    void delete(Integer id){
-        runs.removeIf(run -> run.id().equals(id));
+    //To create, update and delete -> use update
+    public void create(Run run){
+        var updated =  jdbcClient.sql("INSERT INTO run(id,title,started_on,completed_on,miles,location)" +
+                        "values(?,?,?,?,?,?)")
+                .params(List.of(
+                        run.id(),
+                        run.title(),
+                        run.startedOn(),
+                        run.completedOn(),
+                        run.miles(),
+                        run.location().toString()))
+                .update();
+        //Update returns how many rows were affected
+
+        Assert.state(updated==1,"Failed to update run"+ run.title());
     }
 
-    //To mark a method that should be executed after the DI uis done
-    //@PostConstruct will run once all the bean properties have been set.
-    @PostConstruct
-    private void init(){
-        runs.add(new Run(1,"Monday Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(30,
-                ChronoUnit.MINUTES),
-                3,
-                Location.OUTDOOR));
-
-        runs.add(new Run(2,"Tues Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(60,
-                ChronoUnit.MINUTES),
-                3,
-                Location.INDOOR));
-
-        runs.add(new Run(3,"Wed Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(40,
-                ChronoUnit.MINUTES),
-                3,
-                Location.INDOOR));
 
 
-        runs.add(new Run(4,"Thursday Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(20,
-                ChronoUnit.MINUTES),
-                3,
-                Location.OUTDOOR));
-
-        runs.add(new Run(5,"Friday Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(70,
-                ChronoUnit.MINUTES),
-                3,
-                Location.OUTDOOR));
-
-        runs.add(new Run(6,"Sat Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(90,
-                ChronoUnit.MINUTES),
-                3,
-                Location.OUTDOOR));
 
 
-        runs.add(new Run(7,"Sunday Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(44,
-                ChronoUnit.MINUTES),
-                3,
-                Location.INDOOR));
-
-
-        runs.add(new Run(8,"Fun Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(78,
-                ChronoUnit.MINUTES),
-                3,
-                Location.INDOOR));
-
-
-        runs.add(new Run(9,"Rainy Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(39,
-                ChronoUnit.MINUTES),
-                3,
-                Location.INDOOR));
-
-        runs.add(new Run(10,"Windy Run",
-                LocalDateTime.now(),LocalDateTime.now().plus(77,
-                ChronoUnit.MINUTES),
-                3,
-                Location.OUTDOOR));
-
-    }
 
 
 }
