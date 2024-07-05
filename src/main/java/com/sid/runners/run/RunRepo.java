@@ -64,10 +64,13 @@ public class RunRepo {
         Assert.state(updated==1,"Failed to update run"+ run.title());
     }
 
+    public int count(){
+        return jdbcClient.sql("select * from run").query().listOfRows().size();
+    }
 
-
-
-
+    public void saveAll(List<Run> runs){
+        runs.stream().forEach(this::create);
+    }
 
 
 }

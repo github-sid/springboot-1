@@ -2,6 +2,7 @@ package com.sid.runners;
 
 import com.sid.runners.run.Location;
 import com.sid.runners.run.Run;
+import com.sid.runners.run.RunRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -27,12 +28,12 @@ public class Application {
 	//application context -> Container for all the beans
 //CommandLinerRunner -> Run after the application has started(After the application context has been created)
 
-	@Bean
-	CommandLineRunner runner(){
-		return args -> {
-			Run run = new Run(1,"First Run", LocalDateTime.now(), LocalDateTime.now().plus(1, ChronoUnit.HOURS), 5, Location.OUTDOOR);
-			log.info("Run: "+ run);
-		};
-	}
+//	@Bean
+//	CommandLineRunner runner(RunRepo runRepo){
+//		return args -> {
+//			Run run = new Run(1,"First Run", LocalDateTime.now(), LocalDateTime.now().plus(1, ChronoUnit.HOURS), 5, Location.OUTDOOR);
+//			runRepo.create(run);
+//		};
+//	}
 
 }
