@@ -3,9 +3,7 @@ package com.sid.runners.run;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,20 +43,29 @@ public class RunController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
     void create(@Valid @RequestBody Run run){
-        runrepo.create(run);
+        runrepo.save(run);
     }
-//
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    @PutMapping("/{id}")
-//    void update(@Valid @RequestBody Run run,@PathVariable Integer id){
-//        runrepo.update(run,id);
-//    }
-//
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    @DeleteMapping("/{id}")
-//    void delete(@PathVariable Integer id)
-//    {
-//        runrepo.delete(id);
-//    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{id}")
+    void update(@Valid @RequestBody Run run,@PathVariable Integer id){
+        runrepo.save(run);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void delete(@PathVariable Integer id)
+    {
+        runrepo.delete(runrepo.findById(id).get());
+    }
+
+    @GetMapping("/location/{location}")
+    List<Run> findByLocation(@PathVariable String location){
+        return runrepo.findAllByLocation(location);
+
+    }
+
+
+
 }
 
